@@ -7,6 +7,7 @@ output: github_document
 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
+library(knitr)
 ```
 
 I took the the UCLA Phonetics Archive:
@@ -69,6 +70,7 @@ ggplot(data=ucla_glottlog, aes(x=longitude, y=latitude, color=family_id)) +
 Write the combined data as csv.
 
 ```{r}
+head(ucla_glottlog) %>% kable()
 write_csv(ucla_glottlog, 'ucla_glottlog.csv')
 ```
 

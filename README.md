@@ -5,6 +5,7 @@ Steven Moran
 
 ``` r
 library(tidyverse)
+library(knitr)
 ```
 
 I took the the UCLA Phonetics Archive:
@@ -79,6 +80,19 @@ ggplot(data=ucla_glottlog, aes(x=longitude, y=latitude, color=family_id)) +
 ![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 Write the combined data as csv.
+
+``` r
+head(ucla_glottlog) %>% kable()
+```
+
+| Language  | Ethnologue Code | iso_6393 | glottocode | name      | level    | macroarea |  latitude | longitude | id       | family_id | parent_id | bookkeeping | iso639P3code | description | markup_description | child_family_count | child_language_count | child_dialect_count | country_ids       |
+|:----------|:----------------|:---------|:-----------|:----------|:---------|:----------|----------:|----------:|:---------|:----------|:----------|:------------|:-------------|:------------|:-------------------|-------------------:|---------------------:|--------------------:|:------------------|
+| Abaza     | ABQ             | abq      | abaz1241   | Abaza     | language | Eurasia   |  44.25000 |  42.00000 | abaz1241 | abkh1242  | abkh1243  | FALSE       | abq          | NA          | NA                 |                  0 |                    0 |                   3 | RU TR             |
+| Abkhaz    | ABK             | abk      | abkh1244   | Abkhaz    | language | Eurasia   |  43.05622 |  41.15911 | abkh1244 | abkh1242  | abkh1243  | FALSE       | abk          | NA          | NA                 |                  0 |                    0 |                   3 | GE RU TR          |
+| Aceh      | ACE             | ace      | achi1257   | Acehnese  | language | Papunesia |   3.90757 |  96.60320 | achi1257 | aust1307  | cham1327  | FALSE       | ace          | NA          | NA                 |                  0 |                    0 |                   7 | ID                |
+| Adyghe    | ADY             | ady      | adyg1241   | Adyghe    | language | Eurasia   |  44.00000 |  39.33000 | adyg1241 | abkh1242  | circ1239  | FALSE       | ady          | NA          | NA                 |                  0 |                    0 |                   5 | IL JO RU SY TR    |
+| Afrikaans | AFR             | afr      | afri1274   | Afrikaans | language | Africa    | -22.00000 |  30.00000 | afri1274 | indo1319  | afri1273  | FALSE       | afr          | NA          | NA                 |                  0 |                    0 |                   3 | BW MZ NA ZA ZM ZW |
+| Aghul     | AGX             | agx      | aghu1253   | Aghul     | language | Eurasia   |  41.92420 |  47.58430 | aghu1253 | nakh1245  | aghu1260  | FALSE       | agx          | NA          | NA                 |                  0 |                    0 |                   6 | AZ RU             |
 
 ``` r
 write_csv(ucla_glottlog, 'ucla_glottlog.csv')
