@@ -97,3 +97,39 @@ head(ucla_glottlog) %>% kable()
 ``` r
 write_csv(ucla_glottlog, 'ucla_glottlog.csv')
 ```
+
+How many languages (according to ISO 639-3 code) are present in the
+sample?
+
+``` r
+# Less than the number of ISO codes
+nrow(ucla_glottlog %>% select(glottocode) %>% distinct())
+```
+
+    ## [1] 309
+
+``` r
+nrow(ucla_glottlog %>% select(iso_6393) %>% distinct())
+```
+
+    ## [1] 310
+
+How many language families are present in the sample?
+
+``` r
+nrow(ucla_glottlog %>% select(family_id) %>% distinct())
+```
+
+    ## [1] 51
+
+------------------------------------------------------------------------
+
+\*\* TODOS\*\*
+
+- <https://blogs.umass.edu/phonolist/2019/12/03/dockum-bowern-2019-swadesh-wordlists-are-not-long-enough/>
+
+- <https://www.researchgate.net/publication/332751956_Swadesh_lists_are_not_long_enough_Drawing_phonological_generalizations_from_limited_data>
+
+- <https://researchprofiles.anu.edu.au/en/publications/blowing-in-the-wind-using-north-wind-and-the-sun-texts-to-sample->
+
+- read in Eleanor’s table and do some rough stats
