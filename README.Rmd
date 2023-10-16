@@ -1,14 +1,23 @@
 ---
-title: "Combine UCLA Phonetics Lab Archive metadata with Glottolog metadata"
+title: "Combine UCLA Phonetics Lab Archive metadata with Glottolog metadata and do some stats and tests"
 author: "Steven Moran"
 date: "2023-10-09"
-output: github_document
+output: 
+  github_document:
+    toc: true
+
 ---
+
+Load some libraries
 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(knitr)
 ```
+
+***
+
+# Overview
 
 I took the the UCLA Phonetics Archive:
 
@@ -90,9 +99,82 @@ nrow(ucla_glottlog %>% select(family_id) %>% distinct())
 ```
 
 
-***
+# Explore VoxAngeles TextGrid data
 
-** TODOS**
+Read in Eleanor's TextGrid table. First I converted it to UTF-8 (from UTF-16) and to CSV (from TSV).
+
+```{r, warning=FALSE, message=FALSE}
+df <- read_csv('ucla_durations.csv')
+```
+
+Get UCLA phoneme counts per language / phone.
+
+```{r}
+lang_phone_count <- df %>% group_by(lang, phone) %>% summarize(phoneme_count = n())
+```
+
+Get UCLA phoneme counts per language.
+
+```{r}
+ucla_lang_phoneme_count <- lang_phone_count %>% group_by(lang) %>% summarize(ucla_phonemes = n())
+```
+
+Get PHOIBLE CLDF data.
+
+```{r, warning=FALSE, message=FALSE}
+values <- read_csv(url('https://raw.githubusercontent.com/cldf-datasets/phoible/master/cldf/values.csv'))
+languages <- read_csv(url('https://raw.githubusercontent.com/cldf-datasets/phoible/master/cldf/languages.csv'))
+inventories <- read_csv(url('https://raw.githubusercontent.com/cldf-datasets/phoible/master/cldf/inventories.csv'))
+parameters <- read_csv(url('https://raw.githubusercontent.com/cldf-datasets/phoible/master/cldf/parameters.csv'))
+```
+
+Merge into a data frame for the language index with counts.
+
+```{r, warning=FALSE, message=FALSE}
+phoible <- values %>% select(Language_ID, Inventory_ID) %>% distinct()
+phoible <- left_join(phoible, inventories, by=c("Inventory_ID" = "ID"))
+phoible <- phoible %>% rename(Source_name = Name)
+phoible <- left_join(phoible, languages, by=c("Language_ID" = "ID"))
+```
+
+Merge CLDF inventories together with languages index.
+
+```{r}
+tmp <- phoible %>% select(Glottocode, Name, ISO639P3code, count_phonemes) %>% group_by(ISO639P3code) %>% filter(row_number()==1)
+
+ucla_phoible_phoneme_counts <- left_join(ucla_lang_phoneme_count, tmp, by=c("lang"="ISO639P3code"))
+```
+
+We have some NAs in the phoible.count_phonemes data column. Replace with 0.
+
+```{r}
+# ucla_phoible_phoneme_counts$count_phonemes <- ucla_phoible_phoneme_counts$count_phonemes %>% replace_na(0)
+```
+
+Get the delta between the phoneme counts and compare coverage. This doesn't compare phonemes -- just counts between what is unique in VoxAngeles and the number of phonemes in the inventory in PHOIBLE.
+
+To do a fair comparison between the CMU-UCLA / VoxAngeles corpus and PHOIBLE the segments would have to follow the phoible segment conventions.
+
+```{r}
+ucla_phoible_phoneme_counts$delta <- abs(ucla_phoible_phoneme_counts$ucla_phonemes - ucla_phoible_phoneme_counts$count_phonemes)
+
+ucla_phoible_phoneme_counts %>% kable()
+```
+
+
+# Tests
+
+```{r}
+lang_phone_count %>% filter(lang=="lit") %>% distinct(phone) %>% kable()
+```
+
+# TODOS
+
+In progress:
+
+* read in Eleanor's table and do some rough stats
+
+Refs if checking differences in phoneme inventories:
 
 * https://blogs.umass.edu/phonolist/2019/12/03/dockum-bowern-2019-swadesh-wordlists-are-not-long-enough/
 
@@ -100,4 +182,4 @@ nrow(ucla_glottlog %>% select(family_id) %>% distinct())
 
 * https://researchprofiles.anu.edu.au/en/publications/blowing-in-the-wind-using-north-wind-and-the-sun-texts-to-sample-
 
-* read in Eleanor's table and do some rough stats
+
